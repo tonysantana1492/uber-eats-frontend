@@ -1,0 +1,37 @@
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.npm
+/.yarn
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.eslintcache
+
+/.idea
+/.vscode
+
+/src/styles/tailwind.css
+
+npm-debug.log*
+npm-debug.log*
+npm-error.log*
+
+.npm/*
+!./patches
+!.npm/releases
+!.npm/plugins
+!.npm/sdks
+!.npm/versions
+.pnp.*

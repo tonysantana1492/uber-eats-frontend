@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+.yarn/
+
+# production
+build/
+public/
+
+# ide
+.vscode/
+
+# tailwind
+postcss.config.js
+tailwind.config.js
