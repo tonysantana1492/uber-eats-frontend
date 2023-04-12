@@ -1,8 +1,10 @@
 {
-  "name": "my-app",
+  "name": "uber-eats-frontend",
+  "author": "Tony Santana Lopez",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.7.11",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -10,20 +12,24 @@
     "@types/node": "^16.7.13",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
+    "graphql": "^16.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.10.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.4.2",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "tailwind:prodbuild": "NODE_ENV=production npm run tailwind:build",
+    "tailwind:build": "tailwind build -i ./src/styles/tailwind.css -o ./src/styles/styles.css",
+    "start": "npm run apollo:codegen & react-scripts start",
+    "apollo:codegen": " rimraf src/__generated__ && apollo client:codegen src/__generated__ --target=typescript --outputFlat",
+    "build": "CI=false react-scripts build",
+    "prebuild": "npm run tailwind:prodbuild",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint src/**/*.{js,jsx,ts,tsx,json}",
-    "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx,json}'",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+    "test:coverage": "npm test -- --coverage --watchAll=false",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -62,8 +68,7 @@
     "tailwindcss-debug-screens": "^2.2.1"
   },
   "jest": {
-    "collectCoverageFrom": [
-      "src/core/components/**/*.ts",
+    "collectCoverageFrom": [     
       "src/pages/**/*.ts"
     ]
   }
