@@ -1,5 +1,6 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 
+
 # dependencies
 /node_modules
 /.npm
@@ -27,6 +28,7 @@
 npm-debug.log*
 npm-debug.log*
 npm-error.log*
+yarn-error.log*
 
 .npm/*
 !./patches
@@ -35,3 +37,10 @@ npm-error.log*
 !.npm/sdks
 !.npm/versions
 .pnp.*
+
+
+# resources
+/public
+
+#gql
+/src/gql
