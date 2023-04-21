@@ -12,3 +12,7 @@ public/
 # tailwind
 postcss.config.js
 tailwind.config.js
+
+#grapql-code-generator
+src/gql/
+
