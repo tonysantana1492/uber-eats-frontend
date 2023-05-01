@@ -1,6 +1,5 @@
-import { render } from '@testing-library/react';
+import { render } from '../../utils/test-utils';
 import { Restaurant } from '../restaurant';
-import { BrowserRouter } from 'react-router-dom';
 
 describe('<Restaurant />', () => {
 	it('renders OK with props', () => {
@@ -12,18 +11,17 @@ describe('<Restaurant />', () => {
 		};
 
 		const { getByText, container } = render(
-			<BrowserRouter>
+			
 				<Restaurant
 					id={restaurantProps.id}
 					coverImg={restaurantProps.coverImg}
 					name={restaurantProps.name}
 					categoryName={restaurantProps.categoryName}
 				/>
-			</BrowserRouter>,
 		);
 
-		getByText(restaurantProps.name);
-		getByText(restaurantProps.categoryName);
+		expect(getByText(restaurantProps.name)).toBeInTheDocument();
+		expect(getByText(restaurantProps.categoryName)).toBeInTheDocument();
 		expect(container.firstChild).toHaveAttribute('href', `/restaurant/${restaurantProps.id}`);
 	});
 });
