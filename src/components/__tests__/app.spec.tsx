@@ -1,8 +1,8 @@
-import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 
 import { App } from '../app';
 import { isLoggedInVar } from '../../apollo';
+import * as apollo from '@apollo/client';
 
 jest.mock('../../routers/logged-out-router', () => {
 	return {
@@ -18,19 +18,30 @@ jest.mock('../../routers/logged-in-router', () => {
 
 describe('<App />', () => {
 	it('renders LoggedOutRouter', () => {
-		const { getByText } = render(<App />);
+		jest.spyOn(apollo, 'useReactiveVar').mockImplementation(() => false);
 
-		getByText('logged-out');
+		const { getByText } = render(<App />);
+		expect(getByText('logged-out')).toBeInTheDocument();
 	});
 
 	it('renders LoggedInRouter', async () => {
-		const { findByText } = render(<App />);
+		jest.spyOn(apollo, 'useReactiveVar').mockImplementation(() => true);
 
-        await waitFor(() => {
-            isLoggedInVar(true);
+		const { getByText } = render(<App />);
+		expect(getByText('logged-in')).toBeInTheDocument();
+	});
+
+	it('change from LoggedOutRouter to LoggedInRouter', async () => {
+		jest.spyOn(apollo, 'useReactiveVar').mockRestore();
+
+		const { getByText, findByText } = render(<App />);
+
+		expect(getByText('logged-out')).toBeInTheDocument();
+
+		await waitFor(() => {
+			isLoggedInVar(true);
 		});
 
-        await findByText('logged-in');
-		
+		expect(await findByText('logged-in')).toBeInTheDocument();
 	});
 });
