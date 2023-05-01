@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { useRoutes } from 'react-router-dom';
 import { Restaurants } from '../pages/client/restaurants';
 import { UserRole } from '../gql/graphql';
 import { NotFound } from '../pages/404';
@@ -9,34 +9,59 @@ import { EditProfile } from '../pages/user/edit-profile';
 import { Search } from '../pages/client/search';
 import { Category } from '../pages/client/category';
 import { Restaurant } from '../pages/client/restaurant';
+import { MyRestaurants } from '../pages/owner/my-restaurants';
+import { AddRestaurant } from '../pages/owner/add-restaurants';
 
-const clientRoutes = [
+const routes = [
+	// Common
+	{ path: '/confirm', element: <ConfirmEmail />, roles: [] },
+	{ path: '/edit-profile', element: <EditProfile />, roles: [] },
+	{ path: '*', element: <NotFound />, roles: [] },
+	// Client
 	{
 		path: '/',
-		component: <Restaurants />,
+		element: <Restaurants />,
+		roles: [UserRole.Client],
 	},
 	{
 		path: '/search',
-		component: <Search />,
+		element: <Search />,
+		roles: [UserRole.Client],
 	},
 	{
 		path: '/category/:slug',
-		component: <Category />,
+		element: <Category />,
+		roles: [UserRole.Client],
 	},
 	{
 		path: '/restaurant/:id',
-		component: <Restaurant />
+		element: <Restaurant />,
+		roles: [UserRole.Client],
+	},
+	// Owner
+	{
+		path: '/',
+		element: <MyRestaurants />,
+		roles: [UserRole.Owner],
+	},
+	{
+		path: '/add-restaurant',
+		element: <AddRestaurant />,
+		roles: [UserRole.Owner]
 	}
-];
-
-const commonRoutes = [
-	{ path: '/confirm', component: <ConfirmEmail /> },
-	{ path: '/edit-profile', component: <EditProfile /> },
-	{ path: '*', component: <NotFound /> },
 ];
 
 export const LoggedInRouter = () => {
 	const { data, error, loading } = useMe();
+
+	const authorizedRoutes = routes.filter(({ roles }) => {
+		if (roles.length === 0) return true;
+		if(!data) return false;
+
+		return roles.includes(data.me.role);
+	});
+	
+	const elements = useRoutes(authorizedRoutes);
 
 	if (!data || loading || error) {
 		return (
@@ -44,19 +69,13 @@ export const LoggedInRouter = () => {
 				<span className='font-medium text-lg tracking-wide'>Loading...</span>
 			</div>
 		);
-	}
+	}	
+
 
 	return (
 		<div className='h-screen flex flex-col'>
 			<Header />
-			<Routes>
-				{data.me.role === UserRole.Client &&
-					clientRoutes.map(route => <Route path={route.path} key={route.path} element={route.component} />)}
-
-				{commonRoutes.map(route => (
-					<Route path={route.path} key={route.path} element={route.component} />
-				))}
-			</Routes>
+			{elements}
 		</div>
 	);
 };
