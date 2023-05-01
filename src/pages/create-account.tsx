@@ -15,7 +15,7 @@ type IFormData = {
 	role: UserRole;
 };
 
-const CREATE_ACCOUNT_MUTATION = graphql(`
+export const CREATE_ACCOUNT_MUTATION = graphql(`
 	mutation createAccount($createAccountInput: CreateAccountInput!) {
 		createAccount(input: $createAccountInput) {
 			ok
@@ -33,6 +33,7 @@ export const CreateAccount = () => {
 		defaultValues: {
 			role: UserRole.Client,
 		},
+		mode: 'onChange',
 	});
 
 	const navigate = useNavigate();
@@ -72,7 +73,7 @@ export const CreateAccount = () => {
 				<title>Create Account | Uber Eats</title>
 			</Helmet>
 			<div className='w-full max-w-screen-sm flex flex-col px-5 items-center'>
-				<img src={nuberLogo} className='w-52 mb-10' alt='Nuber Eats' />
+				<img src={nuberLogo} className='w-52 mb-10' alt='Uber Eats' />
 				<h4 className='w-full font-medium text-left text-3xl mb-5'>{"Let's get started"}</h4>
 				<form noValidate className='grid gap-3 mt-5 w-full mb-5' onSubmit={handleSubmit(onSubmit)}>
 					<input
@@ -98,16 +99,11 @@ export const CreateAccount = () => {
 					/>
 					{errors.password?.message && <FormError errorMessage={errors.password?.message} />}
 
-					<select
-						placeholder='Role'
-						className='input'
-						{...register('role', { required: 'Role is required' })}
-					>
+					<select placeholder='Role' className='input' {...register('role')}>
 						{Object.values(UserRole).map(role => {
 							return <option key={role}>{role}</option>;
 						})}
 					</select>
-					{errors.role?.message && <FormError errorMessage={errors.role.message} />}
 
 					<Button canClick={isValid} actionText={'Create Account'} loading={loading} />
 					{createAccountMutationResult?.createAccount.error && (
