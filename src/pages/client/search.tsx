@@ -47,7 +47,7 @@ export const Search: FC = () => {
 			<Helmet>
 				<title>Search | Uber Eats</title>
 			</Helmet>
-			<div className='max-w-screen-xl pb-20 mx-auto mt-8'>
+			<div className='container pb-20 mt-8'>
 				<h3 className='font-semibold text-lg'>Search Page</h3>
 				{loading ? (
 					<div className='grid mt-16 px-1 md:grid-cols-3 gap-x-5 gap-y-10'>
