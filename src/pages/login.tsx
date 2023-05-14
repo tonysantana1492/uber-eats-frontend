@@ -9,7 +9,7 @@ import { Button } from '../components/button';
 import { graphql } from '../gql';
 import { LoginMutation } from '../gql/graphql';
 import { authTokenVar, isLoggedInVar } from '../apollo';
-import { LOCALSTORAGE_TOKEN } from '../constants';
+import { APP_TOKEN_NAME } from '../constants';
 
 export const LOGIN_MUTATION = graphql(`
 	mutation login($loginInput: LoginInput!) {
@@ -41,7 +41,7 @@ export const Login = () => {
 		} = data;
 
 		if (ok && token) {
-			localStorage.setItem(LOCALSTORAGE_TOKEN, token);
+			localStorage.setItem(APP_TOKEN_NAME, token);
 			authTokenVar(token);
 			isLoggedInVar(true);
 		}
