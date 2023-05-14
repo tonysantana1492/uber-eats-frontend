@@ -86,14 +86,14 @@ export const Restaurants: FC = () => {
 				/>
 			</form>
 			{!loading && (
-				<div className='max-w-screen-xl pb-20 mx-auto mt-8'>
-					<div className='flex justify-around max-w-sm mx-auto '>
+				<div className='container pb-20 mt-8'>
+					<div className='flex justify-center space-x-10 mx-auto '>
 						{data?.allCategories.categories?.map(category => (
 							<Link key={category.id} to={`/category/${category.slug}`}>
 								<div className='flex flex-col group items-center cursor-pointer'>
 									<div
 										className='w-16 h-16 bg-cover group-hover:bg-gray-100 rounded-full'
-										style={{ backgroundImage: `url(categories/${category.coverImg})` }}
+										style={{ backgroundImage: `url(${category.coverImg})` }}
 									></div>
 									<span className='mt-1 text-sm text-center font-medium'>{category.name}</span>
 								</div>
