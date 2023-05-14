@@ -4,12 +4,18 @@ import { useMutation } from '@apollo/client';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button } from '../../components/button';
 import { FormError } from '../../components/form-error';
+import { APP_API_UPLOAD } from '../../constants';
+import { useState } from 'react';
+import { CreateRestaurantMutation } from '../../gql/graphql';
+import { MY_RESTAURANTS_QUERY } from './my-restaurants';
+import { useNavigate } from 'react-router-dom';
 
 const CREATE_RESTAURANT_MUTATION = graphql(`
 	mutation createRestaurant($input: CreateRestaurantInput!) {
 		createRestaurant(input: $input) {
 			ok
 			error
+			restaurantId
 		}
 	}
 `);
@@ -18,11 +24,28 @@ interface IFormProp {
 	name: 'string';
 	address: 'string';
 	categoryName: 'string';
-	coverImg: 'string';
+	file: FileList;
 }
 
 export const AddRestaurant = () => {
-	const [createRestaurantMutation, { data, loading }] = useMutation(CREATE_RESTAURANT_MUTATION);
+	const [uploading, setUploading] = useState(false);
+	const navigate = useNavigate();
+
+	const onCompleted = (data: CreateRestaurantMutation) => {
+		const {
+			createRestaurant: { ok },
+		} = data;
+
+		if (ok) {
+			setUploading(false);
+			navigate('/');
+		}
+	};
+
+	const [createRestaurantMutation, { data }] = useMutation(CREATE_RESTAURANT_MUTATION, {
+		onCompleted,
+		refetchQueries: [{ query: MY_RESTAURANTS_QUERY }],
+	});
 
 	const {
 		register,
@@ -32,18 +55,34 @@ export const AddRestaurant = () => {
 		mode: 'onChange',
 	});
 
-	const onSubmit: SubmitHandler<IFormProp> = data => {
-		console.log(data);
-		createRestaurantMutation({
-			variables: {
-				input: {
-					name: data.name,
-					address: data.address,
-					categoryName: data.categoryName,
-					coverImg: '',
+	const onSubmit: SubmitHandler<IFormProp> = async ({ name, address, categoryName, file }) => {
+		try {
+			setUploading(true);
+			const actualFile = file[0];
+			const formBody = new FormData();
+			formBody.append('file', actualFile);
+
+			const response = await fetch(APP_API_UPLOAD, {
+				method: 'POST',
+				body: formBody,
+			});
+
+			const { url: coverImg } = await response.json();
+
+			createRestaurantMutation({
+				variables: {
+					input: {
+						name,
+						address,
+						categoryName,
+						coverImg,
+					},
 				},
-			},
-		});
+			});
+		} catch (error) {
+			alert('Ops... something is wrong');
+			console.log(error);
+		}
 	};
 
 	return (
@@ -81,12 +120,12 @@ export const AddRestaurant = () => {
 				<input
 					type='file'
 					accept='image/*'
-					{...register('coverImg', {
+					{...register('file', {
 						required: true,
 					})}
 				/>
-				<Button actionText='Create Restaurant' canClick={isValid} loading={loading} />
-				{data?.createRestaurant?.error && <FormError errorMessage={data.createRestaurant.error} />}
+				<Button actionText='Create Restaurant' canClick={isValid} loading={uploading} />
+				{data?.createRestaurant.error && <FormError errorMessage={data.createRestaurant.error} />}
 			</form>
 		</div>
 	);
