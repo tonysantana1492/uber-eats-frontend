@@ -4,7 +4,8 @@ import { useQuery } from '@apollo/client';
 import { Restaurant } from '../../components/restaurant';
 import { Link } from 'react-router-dom';
 
-const MY_RESTAURANTS_QUERY = graphql(`
+
+export const MY_RESTAURANTS_QUERY = graphql(`
 	query myRestaurants {
 		myRestaurants {
 			ok
@@ -17,7 +18,7 @@ const MY_RESTAURANTS_QUERY = graphql(`
 `);
 export const MyRestaurants = () => {
 	const { data } = useQuery(MY_RESTAURANTS_QUERY);
-
+	
 	if (!data?.myRestaurants.restaurants) {
 		return <h2>Something went wrong!!!</h2>;
 	}
@@ -27,7 +28,7 @@ export const MyRestaurants = () => {
 			<Helmet>
 				<title>My Restaurants | Nuber Eats</title>
 			</Helmet>
-			<div className='max-w-screen-2xl mx-auto mt-24'>
+			<div className='container mt-24'>
 				<h2 className='text-4xl font-medium mb-10'>My Restaurants</h2>
 				{data?.myRestaurants.ok && data.myRestaurants.restaurants.length === 0 ? (
 					<>
