@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 import { screen, render, waitFor } from '../../utils/test-utils';
 import { LOGIN_MUTATION, Login } from '../login';
-import { LOCALSTORAGE_TOKEN } from '../../constants';
+import { APP_TOKEN_NAME } from '../../constants';
 
 describe('<Login />', () => {
 	let mockedClient: MockApolloClient;
@@ -80,7 +80,7 @@ describe('<Login />', () => {
 		});
 
 		expect(localStorage.setItem).toHaveBeenCalledTimes(1);
-		expect(localStorage.setItem).toHaveBeenCalledWith(LOCALSTORAGE_TOKEN, tokenMutation);
+		expect(localStorage.setItem).toHaveBeenCalledWith(APP_TOKEN_NAME, tokenMutation);
 	});
 
 	it('show errors on calls mutation', async () => {
