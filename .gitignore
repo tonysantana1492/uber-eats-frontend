@@ -21,9 +21,6 @@
 .eslintcache
 
 /.idea
-/.vscode
-
-/src/styles/tailwind.css
 
 npm-debug.log*
 npm-debug.log*
