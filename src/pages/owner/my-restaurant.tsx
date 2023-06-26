@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import {
 	VictoryAxis,
 	VictoryChart,
@@ -16,6 +16,7 @@ import { graphql } from '../../gql';
 import { Dish } from '../../components/dish';
 import { useMe } from '../../hooks/useMe';
 import { CreatePaymentMutation } from '../../gql/graphql';
+import { useEffect } from 'react';
 
 type IParams = {
 	id: string;
@@ -48,15 +49,24 @@ export const CREATE_PAYMENT_MUTATION = graphql(`
 	}
 `);
 
+export const PENDING_ORDER_SUBSCRIPTION = graphql(`
+	subscription pendingOrders {
+		pendingOrders {
+			...FullOrderParts
+		}
+	}
+`);
+
 export const MyRestaurant = () => {
 	const { id } = useParams<IParams>();
+	const navigate = useNavigate();
 	const { data: dataUser } = useMe();
 
 	const onCompleted = (data: CreatePaymentMutation) => {
-		if(data.createPayment.ok) {
-			alert('Your restaurant is being promoted')
+		if (data.createPayment.ok) {
+			alert('Your restaurant is being promoted');
 		}
-	}
+	};
 
 	const { data } = useQuery(MY_RESTAURANT_QUERY, {
 		variables: {
@@ -66,18 +76,44 @@ export const MyRestaurant = () => {
 		},
 	});
 
-	const [createPaymentMutation, { loading }] = useMutation(CREATE_PAYMENT_MUTATION, {
-		onCompleted
+	const [createPaymentMutation] = useMutation(CREATE_PAYMENT_MUTATION, {
+		onCompleted,
 	});
 
-
-	const triggerPaddle = () => {
+	const triggerPaddle = async () => {
 		if (dataUser?.me.email) {
+			// /const client = new PaddleSDK('169111', 'your-unique-api-key', 'your-public-key', { sandbox: true });
+
+			// try {
+				// const custom = await client.generatePayLink({
+				// 	// eslint-disable-next-line camelcase
+				// 	product_id: 829055,
+				// 	// eslint-disable-next-line camelcase
+				// 	customer_email: dataUser.me.email,
+				// });
+
+			// 	console.log(custom);
+				
+
+			// 	// createPaymentMutation({
+			// 	// 	variables: {
+			// 	// 		input: {
+			// 	// 			restaurantId: +(id as string),
+			// 	// 			transactionId: data.checkout.id,
+			// 	// 		},
+			// 	// 	},
+			// 	// });
+			// } catch (error) {
+			// 	console.log(error);
+			// }
+
 			// @ts-ignore
-			window.Paddle.Setup({ vendor: 1234567 });
+			// window.Paddle.Environment.set('sandbox');
+			// @ts-ignore
+			window.Paddle.Setup({ vendor: 169111 });
 			// @ts-ignore
 			window.Paddle.Checkout.open({
-				product: 1234567,
+				product: 829055,
 				email: dataUser.me.email,
 				successCallback: (data: { checkout: { id: number } }) => {
 					createPaymentMutation({
@@ -93,10 +129,18 @@ export const MyRestaurant = () => {
 		}
 	};
 
+	const { data: subscriptionData } = useSubscription(PENDING_ORDER_SUBSCRIPTION);
+
+	useEffect(() => {
+		if (subscriptionData?.pendingOrders.id) {
+			navigate(`/orders/${subscriptionData.pendingOrders.id}`);
+		}
+	}, [subscriptionData]);
+
 	return (
 		<div>
 			<Helmet>
-				<title>{data?.myRestaurant.restaurant?.name || 'Loading...'} | Nuber Eats</title>
+				<title>{data?.myRestaurant.restaurant?.name || 'Loading...'} | Uber Eats</title>
 				<script src='https://cdn.paddle.com/paddle/paddle.js'></script>
 			</Helmet>
 			<div className='checkout-container'></div>
