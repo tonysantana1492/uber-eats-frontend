@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 import { graphql } from '../gql';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useMe } from '../hooks/useMe';
 import { OrderStatus, UserRole } from '../gql/graphql';
 
@@ -21,11 +21,33 @@ const GET_ORDER = graphql(`
 	}
 `);
 
+const EDIT_ORDER = graphql(`
+	mutation editOrder($input: EditOrderInput!) {
+		editOrder(input: $input) {
+			ok
+			error
+		}
+	}
+`);
+
 export const Order = () => {
 	const { id } = useParams<IParams>();
 	const { data: userData } = useMe();
 
-	const { data, loading } = useQuery(GET_ORDER, {
+	const [editOrderMutation] = useMutation(EDIT_ORDER, {
+		refetchQueries: [
+			{
+				query: GET_ORDER,
+				variables: {
+					input: {
+						orderId: +(id as string),
+					},
+				},
+			},
+		],
+	});
+
+	const { data } = useQuery(GET_ORDER, {
 		variables: {
 			input: {
 				orderId: +(id as string),
@@ -34,14 +56,14 @@ export const Order = () => {
 	});
 
 	const onButtonClick = (newStatus: OrderStatus) => {
-		// editOrderMutation({
-		//   variables: {
-		//     input: {
-		//       id: +params.id,
-		//       status: newStatus,
-		//     },
-		//   },
-		// });
+		editOrderMutation({
+			variables: {
+				input: {
+					id: +(id as string),
+					status: newStatus,
+				},
+			},
+		});
 	};
 
 	return (
